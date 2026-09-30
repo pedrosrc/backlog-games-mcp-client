@@ -1,0 +1,45 @@
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold tracking-tight">Search games</h1>
+  <p class="mt-1 text-sm text-slate-500">Find a game to add to your backlog or rate.</p>
+
+  <%= form_with url: games_path, method: :get, class: "mt-4 flex gap-2" do |form| %>
+    <%= form.search_field :query, value: @query, placeholder: "Game name", autofocus: true, "aria-label": "Game name", class: "input" %>
+    <%= form.submit "Search", class: "btn-primary" %>
+  <% end %>
+</div>
+
+<% if @result&.success? %>
+  <% if @games.blank? %>
+    <div class="card text-center">
+      <p class="text-slate-600"><%= @result.lines.join(" ") %></p>
+      <%= form_with url: games_path, class: "mt-4" do |form| %>
+        <%= form.hidden_field :name, value: @query %>
+        <%= form.submit "Add “#{@query}” as a new game", class: "btn-secondary" %>
+      <% end %>
+    </div>
+  <% else %>
+    <ul class="space-y-3">
+      <% @games.each do |game| %>
+        <li class="card flex flex-col gap-4 !p-4 sm:flex-row sm:items-center sm:justify-between">
+          <strong class="text-base font-semibold"><%= game["name"] %></strong>
+
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <%= form_with url: backlog_path, class: "flex gap-2" do |form| %>
+              <%= form.hidden_field :game_id, value: game["id"] %>
+              <%= form.select :status, %w[pending playing completed], {}, "aria-label": "Status", class: "input !w-auto" %>
+              <%= form.submit "Add to backlog", class: "btn-primary btn-sm whitespace-nowrap" %>
+            <% end %>
+
+            <%= form_with url: ratings_path, class: "flex gap-2" do |form| %>
+              <%= form.hidden_field :game_id, value: game["id"] %>
+              <%= form.number_field :rating, min: 0, max: 10, step: 0.5, required: true, placeholder: "0–10", "aria-label": "Rating", class: "input !w-20" %>
+              <%= form.submit "Rate", class: "btn-secondary btn-sm" %>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% elsif @result %>
+  <div role="alert" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><%= @result.error %></div>
+<% end %>

@@ -1,0 +1,41 @@
+<div>
+  <h1 class="text-2xl font-semibold tracking-tight">Ask the assistant</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    Ask about your backlog, ratings or games. The assistant can search games, add, rate and remove them for you.
+  </p>
+
+  <%= form_with url: assistant_path, data: { turbo: false }, class: "mt-4 space-y-3" do |form| %>
+    <%= form.label :question, "Your question", class: "sr-only" %>
+    <%= form.text_area :question, value: @question, rows: 3, maxlength: AssistantController::MAX_QUESTION_LENGTH, required: true, autofocus: true,
+          placeholder: "e.g. Add Hades to my backlog and rate it 9", class: "input" %>
+    <div class="flex items-center justify-between gap-3">
+      <p class="text-xs text-slate-500">Examples: “What should I play next?” · “Show my completed games” · “Remove Tetris from my backlog”</p>
+      <%= form.submit "Ask", class: "btn-primary", data: { disable_with: "Thinking…" } %>
+    </div>
+  <% end %>
+</div>
+
+<% if @error %>
+  <div role="alert" class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><%= @error %></div>
+<% end %>
+
+<% if @answer %>
+  <section class="mt-6 card" aria-label="Answer">
+    <h2 class="text-sm font-medium text-slate-500">Answer</h2>
+    <div class="mt-2 space-y-2 text-slate-800"><%= simple_format(h(@answer)) %></div>
+  </section>
+<% end %>
+
+<% if @tool_calls.present? %>
+  <details class="mt-4 text-sm text-slate-600">
+    <summary class="cursor-pointer font-medium">Tools used (<%= @tool_calls.size %>)</summary>
+    <ul class="mt-2 space-y-1">
+      <% @tool_calls.each do |tool_call| %>
+        <li class="flex items-center gap-2">
+          <span class="rounded-full px-2 py-0.5 text-xs font-medium <%= tool_call.ok ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800" %>"><%= tool_call.ok ? "ok" : "error" %></span>
+          <code class="text-xs"><%= tool_call.name %>(<%= tool_call.arguments.map { |key, value| "#{key}: #{value.to_json}" }.join(", ") %>)</code>
+        </li>
+      <% end %>
+    </ul>
+  </details>
+<% end %>

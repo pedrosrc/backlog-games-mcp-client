@@ -1,0 +1,21 @@
+<div class="card">
+  <h1 class="text-2xl font-semibold tracking-tight">Sign in</h1>
+  <p class="mt-1 text-sm text-slate-500">Access your games backlog.</p>
+
+  <%= form_with url: session_path, class: "mt-6 space-y-4" do |form| %>
+    <div>
+      <%= form.label :email_address, "Email", class: "label" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "input" %>
+    </div>
+    <div>
+      <%= form.label :password, "Password", class: "label" %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72, class: "input" %>
+    </div>
+    <%= form.submit "Sign in", class: "btn-primary w-full" %>
+  <% end %>
+
+  <div class="mt-6 flex items-center justify-between text-sm">
+    <%= link_to "Forgot password?", new_password_path, class: "link" %>
+    <%= link_to "Create an account", new_registration_path, class: "link" %>
+  </div>
+</div>

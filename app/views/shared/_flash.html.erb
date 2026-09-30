@@ -1,0 +1,7 @@
+<% { alert: "border-red-200 bg-red-50 text-red-800", notice: "border-emerald-200 bg-emerald-50 text-emerald-800" }.each do |type, classes| %>
+  <% if flash[type].present? %>
+    <div role="<%= type == :alert ? "alert" : "status" %>" class="mb-6 rounded-lg border px-4 py-3 text-sm <%= classes %>">
+      <%= flash[type] %>
+    </div>
+  <% end %>
+<% end %>

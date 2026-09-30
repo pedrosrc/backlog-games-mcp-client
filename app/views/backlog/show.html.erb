@@ -1,0 +1,65 @@
+<h1 class="text-2xl font-semibold tracking-tight">My backlog</h1>
+<p class="mt-1 text-sm text-slate-500">Games you have queued, started or finished.</p>
+
+<div class="mt-6">
+  <% if @result.success? %>
+    <% if @items.empty? %>
+      <div class="card text-center text-slate-600">
+        <p><%= @result.lines.first || "Your backlog is empty." %></p>
+        <p class="mt-2 text-sm"><%= link_to "Search for games to add", games_path, class: "link" %></p>
+      </div>
+    <% else %>
+      <%= form_with url: backlog_path, method: :get, class: "mb-4 flex flex-wrap items-end gap-3" do |form| %>
+        <div>
+          <%= form.label :status, "Status", class: "label" %>
+          <%= form.select :status, options_for_select(BacklogFilter::STATUSES.map { |s| [ s.capitalize, s ] }, @filter.status),
+                { include_blank: "All" }, class: "input !w-40" %>
+        </div>
+        <div>
+          <%= form.label :rating, "Rating", class: "label" %>
+          <%= form.select :rating, options_for_select(BacklogFilter.rating_options, @filter.rating),
+                { include_blank: "Any" }, class: "input !w-40" %>
+        </div>
+        <%= form.submit "Filter", class: "btn-primary" %>
+        <% if @filter.active? %>
+          <%= link_to "Clear", backlog_path, class: "btn-secondary" %>
+        <% end %>
+      <% end %>
+
+      <% if @visible_items.empty? %>
+        <div class="card text-center text-slate-600">
+          No games match these filters.
+          <%= link_to "Clear filters", backlog_path, class: "link" %>
+        </div>
+      <% else %>
+        <p class="mb-2 text-sm text-slate-500"><%= pluralize(@visible_items.size, "game") %><%= " of #{@items.size}" if @filter.active? %></p>
+        <ul class="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <% @visible_items.each do |item| %>
+            <li class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex items-center gap-3">
+                <span class="font-medium"><%= item["name"] %></span>
+                <span class="rounded-full px-2.5 py-0.5 text-xs font-medium <%= status_badge_classes(item["status"]) %>"><%= item["status"] %></span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <%= form_with url: ratings_path, class: "flex items-center gap-2" do |form| %>
+                  <%= form.hidden_field :game_id, value: item["game_id"] %>
+                  <%= form.number_field :rating, value: (format_rating(item["rating"]) if item["rating"]), min: 0, max: 10, step: 0.5,
+                        required: true, placeholder: "—", "aria-label": "Rating for #{item["name"]}", class: "input !w-20" %>
+                  <%= form.submit (item["rating"] ? "Update" : "Rate"), class: "btn-secondary btn-sm" %>
+                <% end %>
+
+                <%= button_to "Remove", backlog_item_path(game_id: item["game_id"]), method: :delete,
+                      form: { data: { turbo_confirm: "Remove #{item["name"]} from your backlog?" } },
+                      "aria-label": "Remove #{item["name"]} from backlog",
+                      class: "btn-sm cursor-pointer rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50" %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  <% else %>
+    <div role="alert" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><%= @result.error %></div>
+  <% end %>
+</div>

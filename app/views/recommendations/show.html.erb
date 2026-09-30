@@ -1,0 +1,14 @@
+<h1 class="text-2xl font-semibold tracking-tight">Recommendations</h1>
+<p class="mt-1 text-sm text-slate-500">Top-rated games that are not in your backlog yet.</p>
+
+<div class="mt-6">
+  <% if @result.success? %>
+    <div class="card space-y-2">
+      <% @result.lines.each do |line| %>
+        <p class="text-slate-700"><%= line %></p>
+      <% end %>
+    </div>
+  <% else %>
+    <div role="alert" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><%= @result.error %></div>
+  <% end %>
+</div>

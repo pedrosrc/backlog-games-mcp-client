@@ -1,0 +1,37 @@
+<div class="card">
+  <h1 class="text-2xl font-semibold tracking-tight">Create an account</h1>
+  <p class="mt-1 text-sm text-slate-500">Start tracking the games you want to play.</p>
+
+  <% if @user.errors.any? %>
+    <ul role="alert" class="mt-4 list-inside list-disc rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      <% @user.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%= form_with model: @user, url: registration_path, class: "mt-6 space-y-4" do |form| %>
+    <div>
+      <%= form.label :name, "Name", class: "label" %>
+      <%= form.text_field :name, required: true, autofocus: true, autocomplete: "name", class: "input" %>
+    </div>
+    <div>
+      <%= form.label :email_address, "Email", class: "label" %>
+      <%= form.email_field :email_address, required: true, autocomplete: "username", class: "input" %>
+    </div>
+    <div>
+      <%= form.label :password, "Password", class: "label" %>
+      <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "input" %>
+      <p class="mt-1 text-xs text-slate-500">At least 8 characters.</p>
+    </div>
+    <div>
+      <%= form.label :password_confirmation, "Confirm password", class: "label" %>
+      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "input" %>
+    </div>
+    <%= form.submit "Sign up", class: "btn-primary w-full" %>
+  <% end %>
+
+  <p class="mt-6 text-center text-sm text-slate-500">
+    Already have an account? <%= link_to "Sign in", new_session_path, class: "link" %>
+  </p>
+</div>
