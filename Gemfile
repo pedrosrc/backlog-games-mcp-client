@@ -35,7 +35,7 @@ group :test do
 end
 
 gem "mcp", ">= 1.6"
-gem "faraday", "~> 2.14"
+gem "faraday", "~> 2.15"
 gem "dotenv-rails", "~> 3.2"
 gem "event_stream_parser", "~> 1.0"
 gem "tailwindcss-rails", "~> 4.6"
